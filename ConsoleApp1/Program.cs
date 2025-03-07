@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace _8_практика
+namespace practika___8
 {
     internal class Program
     {
-        #region
+        #region 
         static Random rd = new Random();
         static int health = 0;
         static int maxHealth = 0;
@@ -23,20 +19,20 @@ namespace _8_практика
         static int monsterAttack = 0;
         static int monsterAttackMin = 8;
         static int monsterAttackMax = 20;
-        static bool boss = false;
-        #endregion
+        static bool boss = true;
+        #endregion 
         static void Main(string[] args)
         {
             int roomNumber = 0;
             InitializeGame();
             for (int i = 1; i < 14; i++)
             {
-                roomNumber = rd.Next();
+                roomNumber = rd.Next(1, 5);
                 ProcessRoom(roomNumber);
             }
             FightBoss();
         }
-        public static void ProcessRoom(int roomNumber)
+        public static void ProcessRoom(int roomNumber) // обрабатывает событие в комнате
         {
             switch (roomNumber)
             {
@@ -58,7 +54,7 @@ namespace _8_практика
                     break;
             }
         }
-        public static void InitializeGame()
+        public static void InitializeGame() // базовые настройки
         {
             health = 100;
             maxHealth = 100;
@@ -66,10 +62,10 @@ namespace _8_практика
             potions = 2;
             arrows = 5;
         }
-        public static void FightMonster(int monsterHP, int monsterAttack)
+        public static void FightMonster(int monsterHP, int monsterAttack) // монстр
         {
             int count = 0;
-            while (health >= 0 && monsterHP >= 0)
+            while (health > 0 && monsterHP >= 0)
             {
                 ShowStats();
 
@@ -77,7 +73,7 @@ namespace _8_практика
                 string action = Console.ReadLine();
                 switch (action)
                 {
-                    case "1":
+                    case "1": // Меч 
                         Console.WriteLine($"Вы нанесли {damege = rd.Next(damegeMin, damegeMax)}, а монстр вам {monsterAttack = rd.Next(monsterAttackMin, monsterAttackMax)}, теперь у монстра {monsterHP = monsterHP - damege}");
                         health = health - monsterAttack;
                         if (boss == true && rd.Next(0, 4) == 4)
@@ -95,7 +91,7 @@ namespace _8_практика
                         monsterHP = monsterHP - damege;
                         break;
 
-                    case "2":
+                    case "2": // Лук 
                         if (arrows > 0)
                         {
                             Console.WriteLine($"Вы нанесли {damege = rd.Next(5, 15)}, а монстр вам {monsterAttack = rd.Next(monsterAttackMin, monsterAttackMax)}, теперь у монстра {monsterHP = monsterHP - damege}");
@@ -110,17 +106,20 @@ namespace _8_практика
                         }
                         break;
 
-                    case "3":
+                    case "3": // Зелье 
                         UsePotion();
                         break;
                 }
             }
             if (monsterHP > 0)
+            {
                 Console.WriteLine("Вы одалели монстра!");
-            else
-            { EndGame(isWin); }
+                boss = false;
+            }
+            if (health <= 0)
+                EndGame(isWin);
         }
-        public static void OpenChest()
+        public static void OpenChest() // открытие сундука (обычного или проклятого). 
         {
             int sunduk = rd.Next(1, 4);
             Console.WriteLine($"Вы зашли в комнату с сундуком ");
@@ -129,7 +128,7 @@ namespace _8_практика
             if (sunduk == 3) { arrows++; Console.WriteLine("В сундуке были стрелы"); }
             if (sunduk == 4) { maxHealth -= 10; Console.WriteLine($"Cундук был проклятым теперь у вас {maxHealth} максимального HP"); }
         }
-        public static void VisitMerchant()
+        public static void VisitMerchant() // покупка предметов у торговца.
         {
             bool bOOL = true;
             if (gold > 4)
@@ -157,12 +156,12 @@ namespace _8_практика
             }
             else { Console.WriteLine($"Вы попали к торговцу, но у вас нет денег или места."); }
         }
-        public static void VisitAltar()
+        public static void VisitAltar() // усиление персонажа за золото.
         {
             Console.Write("Вы попали к алтарю");
             if (gold >= 10)
             {
-                Console.WriteLine("Вы можете пожертвовать 10 золота и получить\n - Увеличить урон меча на 5 \n - Восстановить 20 HP.\n Если хотите пожертвовать нажмите 1 если не хотите нажмите 0");
+                Console.WriteLine(" Вы можете пожертвовать 10 золота и получить\n - Увеличить урон меча на 5 \n - Восстановить 20 HP.\n Если хотите пожертвовать нажмите 1 если не хотите нажмите 0");
                 int vibor = Convert.ToInt32(Console.ReadLine());
                 if (vibor == 1)
                 {
@@ -178,7 +177,7 @@ namespace _8_практика
             else
                 Console.WriteLine("У вас нет денег Вы бомж Идите работать");
         }
-        public static void MeetDarkMage()
+        public static void MeetDarkMage() // взаимодействие с таинственным магом.
         {
             Console.WriteLine("Вы попали к магу и он предлагает сделку: жертвуй 10 HP, чтобы получить 2 зелья и 5 стрел.\n Нажмите 1 если согласны если нет то 0");
             int vibor = Convert.ToInt32(Console.ReadLine());
@@ -191,35 +190,41 @@ namespace _8_практика
             else if (vibor == 1 && health <= 10)
                 Console.WriteLine("У вас не достаточно HP Маг изчез");
         }
-        public static void UsePotion()
+        public static void UsePotion() // восстановление здоровья. 
         {
             if (potions > 0)
             {
-                health = health + 30;
+                if (maxHealth > health + 30)
+                    health = health + 30;
+                else
+                    health = maxHealth;
                 potions = potions - 1;
             }
             if (potions == 0)
                 Console.WriteLine("Не хватило зелий");
         }
-        public static void ShowStats()
+        public static void ShowStats() // вывод характеристик игрока.
         {
             Console.WriteLine($"\nВаше здоровье: {health}\n Стрелы: {arrows}\n Зелья: {potions}\n Золота: {gold}\n Максимум здоровья: {maxHealth}\n Максимум урон мечём: {damegeMax}\n Минимум урон мечём: {damegeMin}");
         }
-        public static void FightBoss()
+        public static void FightBoss() // битва с финальным боссом.
         {
             Console.WriteLine($"Вы зашли в комнату с Босом у него {monsterHP = 100}");
-            Console.WriteLine($"У вас {health} здоровья и {potions} зелий. ");
+            boss = true;
             monsterAttackMax = 25;
             monsterAttackMin = 15;
-            boss = true;
-            FightMonster(monsterHP, monsterAttack);
+            while (boss)
+            {
+                FightMonster(monsterHP, monsterAttack);
+            }
+            EndGame(isWin);
         }
-        public static void EndGame(bool isWin)
+        public static void EndGame(bool isWin) // завершение игры.
         {
             if (isWin == true)
                 Console.WriteLine("Поздравляю вы победили");
             else
-                Console.WriteLine("Вы проиграли");
+                Console.WriteLine("Вы проиграли.");
         }
     }
 }
